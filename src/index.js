@@ -12,14 +12,18 @@ const publicDirectoryPath = path.join(__dirname, "../public");
 
 app.use(express.static(publicDirectoryPath));
 
-let count = 0;
-
 io.on("connection", (socket) => {
-  socket.emit("countUpdated", count);
-  socket.on("increment", () => {
-    count++;
-    io.emit("countUpdated", count);
+  socket.emit("greet", "Welcome connected");
+
+  socket.broadcast.emit("greet", "New user joined!");
+
+  socket.on("sendText", (text) => {
+    io.emit("displayMsg", text);
   });
+
+  socket.on('disconnect', () => {
+    io.emit('displayMsg', 'User has left!')
+  })
 });
 
 app.get("/", function (req, res) {
